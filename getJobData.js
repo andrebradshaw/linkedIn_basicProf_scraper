@@ -64,7 +64,7 @@ function parseJob2(elm){
 		var edate = '"end_date":"'+end+'"';
 		var geo = '"local":"'+ge+'"';
 		var descr = '"description":"'+de+'"';
-		var containStr = containStr + '{'+company+','+coId+','+title+','+geo+','+sdate+','+edate+','+descr+'}';
+		var containStr = containStr + ('{'+company+','+coId+','+title+','+geo+','+sdate+','+edate+','+descr+'}').replace(/"undefined"/g, '""');
 	}
 	return containStr;
 }
