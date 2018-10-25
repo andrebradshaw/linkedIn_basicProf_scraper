@@ -1,5 +1,4 @@
 
-function getJobData(){
 function grp(elm,n){if(elm != null){return elm[n].trim();}else{return '';}}
 function formatNow(){	var d = new Date();	var m = /(?<=\w{3}\s+)\w{3}/.exec(d)[0];	return "15 "+m+' '+d.getFullYear();}
 
@@ -18,8 +17,8 @@ var rxe = /(?<=\s+–\s+).{0,9}/;
 
 var jobs = document.getElementById("oc-background-section").getElementsByClassName("pv-entity__position-group-pager ember-view");
 
-function parseJob(str){
-	var str = str.trim();
+function parseJob(elm){
+	var str = elm.innerText.trim();
 	var oneline = str.replace(/\n/g, '\\n').replace(/'|"/g, "\'");
 	var co = grp(new RegExp(regXcoName).exec(str),0);
 	var ti = grp(new RegExp(regXtitle).exec(str),0);
@@ -30,19 +29,20 @@ function parseJob(str){
 	var end = dateParser(grp(rxe.exec(da),0));
 
 	var company = '"company":"'+co+'"';
+	var coId = '"companyId":"'+grp(/(?<=linkedin\.com\/company\/)\d+/.exec(elm.getElementsByTagName("a")[0].href),0)+'"';
 	var title = '"title":"'+ti+'"';
 	var sdate = '"start_date":"'+start+'"';
 	var edate = '"end_date":"'+end+'"';
 	var geo = '"local":"'+ge+'"';
-	var descr = '"description":"'+oneline.replace(/.+?Location.{0,30}?\\n/, '')+'"';
-return '{'+company+','+title+','+geo+','+sdate+','+edate+','+descr+'}';
+	var descr = '"description":"'+grp(/(?<=Location.{0,30}?\\n).+?(?=\\nTitle\B)|(?<=Location.{0,30}?\\n).+?$/.exec(oneline),0)+'"';
+return '{'+company+','+coId+','+title+','+geo+','+sdate+','+edate+','+descr+'}';
 }
 
-function parseJob2(str){
+function parseJob2(elm){
 	var containStr = '';
-	var str = str.trim();
+	var str = elm.innerText.trim();
 	var oneline = str.replace(/\n/g, '\\n').replace(/'|"/g, "\'");
-	
+	var coId = '"companyId":"'+grp(/(?<=linkedin\.com\/company\/)\d+/.exec(elm.getElementsByTagName("a")[0].href),0)+'"';
 	var com = str.match(new RegExp(regXcoName, "g"));
 	var tim = str.match(new RegExp(regXmTitle, "g"));
 	var dam = str.match(new RegExp(regXdates, "g"));
@@ -53,32 +53,34 @@ function parseJob2(str){
 		var ti = tim[m];
 		var da = dam[m];
 		var ge = gem[m];
-		var de = dem[m];
+		var de = grp(dem,m);
 		var start = dateParser(grp(rxs.exec(da),0));
 		var end = dateParser(grp(rxe.exec(da),0));
 
 		var company = '"company":"'+co+'"';
+
 		var title = '"title":"'+ti+'"';
 		var sdate = '"start_date":"'+start+'"';
 		var edate = '"end_date":"'+end+'"';
 		var geo = '"local":"'+ge+'"';
 		var descr = '"description":"'+de+'"';
-		var containStr = containStr + '{'+company+','+title+','+geo+','+sdate+','+edate+','+descr+'}';
+		var containStr = containStr + '{'+company+','+coId+','+title+','+geo+','+sdate+','+edate+','+descr+'}';
 	}
 	return containStr;
 }
 
-var output = '';
+var jobOutput = '';
 
 for(j=0; j<jobs.length; j++){
 	if(/\nTitle\B/m.test(jobs[j].innerText) === false){
-		var output = output + parseJob(jobs[j].innerText);
+		var jobOutput = jobOutput + parseJob(jobs[j]);
 	}else{
-		var output = output + parseJob2(jobs[j].innerText);
+		var jobOutput = jobOutput + parseJob2(jobs[j]);
 	}
 	
 }
-return '['+output.replace(/\}\{/g, '},{')+']';
-}
+'{"employment":['+jobOutput.replace(/\}\{/g, '},{')+']}';
+
+
 
 
