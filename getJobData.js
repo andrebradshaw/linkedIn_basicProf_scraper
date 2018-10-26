@@ -1,5 +1,4 @@
-
-function grp(elm,n){if(elm != null){return elm[n].trim();}else{return '';}}
+function grp(elm,n){if(elm == null || elm[n] == undefined){return '';}else{return elm[n].trim();}}
 function formatNow(){	var d = new Date();	var m = /(?<=\w{3}\s+)\w{3}/.exec(d)[0];	return "15 "+m+' '+d.getFullYear();}
 
 function dateParser(str){	var xmonths = /Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec/;	var xPres = /Present/;	if(/\d+/.test(str) === true || xPres.test(str)){		if(xmonths.test(str) === true){			return ("15 "+str).trim();		}else if(xPres.test(str) === true){
@@ -80,7 +79,4 @@ for(j=0; j<jobs.length; j++){
 	
 }
 '{"employment":['+jobOutput.replace(/\}\{/g, '},{')+']}';
-
-
-
 
