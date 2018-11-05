@@ -1,5 +1,5 @@
 //this version is for sending to Google Sheets
-
+function formatNow(){	var d = new Date();	var m = /(?<=\w{3}\s+)\w{3}/.exec(d)[0];	return "15 "+m+' '+d.getFullYear();}
 function dateParser(str){	var xmonths = /Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec/;	var xPres = /Present/;	if(/\d+/.test(str) === true || xPres.test(str)){		if(xmonths.test(str) === true){			return ("15 "+str).trim();		}else if(xPres.test(str) === true){
 			return formatNow();		}else{
 			return ("15 Jul "+str).trim();		}
@@ -53,6 +53,6 @@ function parseWorkType2(obj) {
 parseWorkType1(work_exp_v1);
 parseWorkType2(work_exp_v2);
 
-JSON.stringify(expContainArr)
+JSON.stringify(expContainArr.sort((a, b) => (b.ed) - (a.ed)))
 
 
