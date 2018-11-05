@@ -24,8 +24,8 @@ function parseWorkType1(obj) {
     let dates = workliContainer1.getElementsByTagName("h4")[1].getElementsByTagName("span")[1].innerText.trim();
     let geo = workliContainer1.getElementsByTagName("h4")[3].getElementsByTagName("span")[1].innerText.trim();
 	let desc = checker(workliContainer1.getElementsByClassName("pv-entity__extra-details"),0);
-	let start = dateParser(grp(rxs.exec(dates),0));
-		let end = dateParser(grp(rxe.exec(dates),0));
+	let start = dateParser(vld(rxs.exec(dates),0));
+		let end = dateParser(vld(rxe.exec(dates),0));
           expContainArr.push({"companyName": companyName, "companyId": companyId, "jobTitle": jobTitle, "geo": geo, "start": start, "end":end, "description": desc});
   }
 }
@@ -41,8 +41,8 @@ function parseWorkType2(obj) {
       let dates = deetz[ul].getElementsByTagName("h4")[0].getElementsByTagName("span")[1].innerText.trim();
       let geo = deetz[ul].getElementsByTagName("h4")[2].getElementsByTagName("span")[1].innerText.trim();
 		let desc = checker(deetz[ul].getElementsByClassName("pv-entity__extra-details"),0);
-		let start = dateParser(grp(rxs.exec(dates),0));
-		let end = dateParser(grp(rxe.exec(dates),0));
+		let start = dateParser(vld(rxs.exec(dates),0));
+		let end = dateParser(vld(rxe.exec(dates),0));
 
       expContainArr.push({"companyName": companyName, "companyId": companyId, "jobTitle": jobTitle, "geo": geo, "start": start, "end":end, "description": desc});
     }
