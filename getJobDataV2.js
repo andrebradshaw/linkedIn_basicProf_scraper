@@ -1,5 +1,14 @@
+function formatNow(){	var d = new Date();	var m = /(?<=\w{3}\s+)\w{3}/.exec(d)[0];	return "15 "+m+' '+d.getFullYear();}
+function dateParser(str){	var xmonths = /Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec/;	var xPres = /Present/;	if(/\d+/.test(str) === true || xPres.test(str)){		if(xmonths.test(str) === true){			return ("15 "+str).trim();		}else if(xPres.test(str) === true){
+			return formatNow();		}else{
+			return ("15 Jul "+str).trim();		}
+	}else{		return '';	}}
 function vld(elm, n) {  if (elm != null) {    return elm[n];  } else {    return '';  }}
 function checker(elm, n){	if(elm[n] != undefined) {	return elm[n].getElementsByTagName("p")[0].innerText.replace(/\n/g, '__ ').replace(/"/g, "'").replace(/,/g, ';');} else {	return '';}}
+var rxs = /^.{0,9}(?=\s+–)/;
+var rxe = /(?<=\s+–\s+).{0,9}/;
+
+var expContainArr = [];
 
 var workExperience = document.getElementById("experience-section");
 
@@ -15,7 +24,9 @@ function parseWorkType1(obj) {
     let dates = workliContainer1.getElementsByTagName("h4")[1].getElementsByTagName("span")[1].innerText.trim();
     let geo = workliContainer1.getElementsByTagName("h4")[3].getElementsByTagName("span")[1].innerText.trim();
 	let desc = checker(workliContainer1.getElementsByClassName("pv-entity__extra-details"),0);
-    console.log(companyName + companyId + jobTitle + dates + geo + desc);
+	let start = dateParser(grp(rxs.exec(dates),0));
+		let end = dateParser(grp(rxe.exec(dates),0));
+          expContainArr.push({"companyName": companyName, "companyId": companyId, "jobTitle": jobTitle, "geo": geo, "start": start, "end":end, "description": desc});
   }
 }
 
@@ -29,11 +40,22 @@ function parseWorkType2(obj) {
       let jobTitle = deetz[ul].getElementsByTagName("h3")[0].getElementsByTagName("span")[1].innerText.trim();
       let dates = deetz[ul].getElementsByTagName("h4")[0].getElementsByTagName("span")[1].innerText.trim();
       let geo = deetz[ul].getElementsByTagName("h4")[2].getElementsByTagName("span")[1].innerText.trim();
-	  let desc = checker(deetz[ul].getElementsByClassName("pv-entity__extra-details"),0);
-      console.log(companyName + jobTitle + dates + geo + desc);
+		let desc = checker(deetz[ul].getElementsByClassName("pv-entity__extra-details"),0);
+		let start = dateParser(grp(rxs.exec(dates),0));
+		let end = dateParser(grp(rxe.exec(dates),0));
+
+      expContainArr.push({"companyName": companyName, "companyId": companyId, "jobTitle": jobTitle, "geo": geo, "start": start, "end":end, "description": desc});
     }
   }
 
 }
 
-parseWorkType2(work_exp_v2)
+parseWorkType1(work_exp_v1);
+parseWorkType2(work_exp_v2);
+
+var nowPlus = new Date().getTime() + 60000;
+
+var experience = expContainArr.sort((a, b) => Number(new Date(b.end).getTime(),nowPlus) - Number(new Date(a.end).getTime(),nowPlus));
+JSON.stringify(experience);
+
+
