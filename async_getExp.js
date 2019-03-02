@@ -12,7 +12,7 @@ var rxe = /(?<=\s+–\s+).{0,9}/;
 var scrids = docb.innerHTML.match(/ember\d+/g);
 
 async function smoothScrollUp(){
-  for(var i=0; i<10000; i=i+100){
+  for(var i=0; i>10000; i=i-100){
     await delay((Math.round(Math.random()) + 1));
 	await window.scrollTo(0, (docb.scrollTop + i) / 2);
   }
@@ -124,17 +124,17 @@ function getJobExperience() {
 
     function parseWorkType2(obj) {
       for (w = 0; w < obj.length; w++) {
-        let deetz = obj[w].getElementsByClassName("pv-entity__position-group-role-item");
-        let companyName = obj[w].parentElement.getElementsByTagName("h3")[0].getElementsByTagName("span")[1].innerText.trim();
-        let companyId = vld(/\d+/.exec(obj[w].parentElement.getElementsByTagName("a")[0].href), 0);
+        var deetz = cn(obj[w], 'pv-entity__position-group-role-item');
+        var companyName = tn(tn(obj[w].parentElement,'h3')[0], 'span')[1].innerText.trim();
+        var companyId = vld(/\d+/.exec(tn(obj[w].parentElement,'a')[0].href), 0);
 
         for (ul = 0; ul < deetz.length; ul++) {
-          let jobTitle = deetz[ul].getElementsByTagName("h3")[0].getElementsByTagName("span")[1].innerText.trim();
-          let dates = deetz[ul].getElementsByTagName("h4")[0].getElementsByTagName("span")[1].innerText.trim();
-          let geo = deetz[ul].getElementsByTagName("h4")[2].getElementsByTagName("span")[1].innerText.trim();
-          let desc = checker(deetz[ul].getElementsByClassName("pv-entity__extra-details"), 0);
-          let start = dateParser(vld(rxs.exec(dates), 0));
-          let end = dateParser(vld(rxe.exec(dates), 0));
+          var jobTitle = tn(tn(deetz[ul],'h3')[0],'span')[1].innerText.trim();
+          var dates = tn(tn(deetz[ul],'h4')[0],'span')[1].innerText.trim();
+          var geo = tn(tn(deetz[ul],'h4')[2],'span')[1].innerText.trim();
+          var desc = checker(cn(deetz[ul],'pv-entity__extra-details'), 0);
+          var start = dateParser(vld(rxs.exec(dates), 0));
+          var end = dateParser(vld(rxe.exec(dates), 0));
 
           experience.push({
             "companyName": companyName,
@@ -155,6 +155,3 @@ function getJobExperience() {
 }
 
 initScrolls()
-// var scr = new Promise(res =>{	res(scroller());});
-
-// scr.then(runFirstExpansion()).then(expander("lt-line-clamp__more"));
