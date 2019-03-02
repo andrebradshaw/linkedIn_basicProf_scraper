@@ -1,4 +1,4 @@
-var cn = (ob, nm) => ob.getElementsByClassName(nm);
+var cn = (ob, nm) => ob ? ob.getElementsByClassName(nm) : console.log(ob);
 var tn = (ob, nm) => ob.getElementsByTagName(nm);
 var gi = (ob, nm) => ob.getElementById(nm);
 var delay = (ms) => new Promise(res => setTimeout(res, ms));
@@ -71,7 +71,11 @@ var checkElmText = (elm, n) => elm[n] != undefined && elm[n] != null ? elm[n].in
 
 var formatNow = "15 " + /(?<=\w{3}\s+)\w{3}/.exec(new Date())[0] + ' ' + new Date().getFullYear();
 
-
+function clickContact() { 
+	if(cn(doc, 'pv-top-card-v2-section__links')[0]) Array.from(tn(cn(doc, 'pv-top-card-v2-section__links')[0],'a')).map(itm=> {
+		if (/contact-info/.test(itm.href)) itm.click();
+    });
+}
 function dateParser(str) {
   var xmonths = /Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec/;
   var xPres = /Present/;
@@ -94,7 +98,6 @@ var pidInformation = [];
 var experience = [];
 var education = [];
 var skills = [];
-
 
 function getJobExperience() {
   var workExperience = gi(doc, 'experience-section');
@@ -254,7 +257,55 @@ function getAccomplishments() {
       }
     }
 }
+function getUid() {
+  var coda = tn(doc,'code');
+  for (d = 0; d < coda.length; d++) {
+    let regXuid = /urn:li:fs_treasuryMedia:\((.{39}),\d+/;
+    if (regXuid.test(coda[d].innerText) === true) {
+      return regXuid.exec(coda[d].innerText)[1];
+    }
+  }
+}
+async function getPID() {
+	await delay(444);
+    var infoCont = document.getElementsByClassName("pv-top-card-v2-section__info");
+    var fullname = checkElmText(infoCont[0].getElementsByTagName("h1"), 0);
+    var headline = checkElmText(infoCont[0].getElementsByTagName("h2"), 0);
+    var geo = checkElmText(infoCont[0].getElementsByTagName("h3"), 0);
+    var summary = checkElmText(document.getElementsByClassName("pv-top-card-section__summary-text"), 0);
+    var container = document.getElementById("artdeco-modal-outlet").getElementsByClassName("pv-profile-section__section-info section-info")[0];
+    var phones = checkElmText(container.getElementsByClassName("ci-phone"), 0);
+    var websites = checkElmText(container.getElementsByClassName("ci-websites"), 0);
+    var emails = checkElmText(container.getElementsByClassName("ci-email"), 0);
+    var twitter = checkElmText(container.getElementsByClassName("ci-twitter"), 0);
 
+    pidInformation.push({
+      "fullname": fullname,
+      "headline": headline,
+      "city": geo,
+      "summary": summary,
+      "phones": phones,
+      "websites": websites,
+      "emails": emails,
+      "twitter": twitter
+    });
+}
+
+function fullObject() {
+  var namedPath = vld(/com\/in\/(.+?)\//.exec(window.location.href), 1);
+    var linkedinProfile = {
+      "lid": getUid(),
+      "path": namedPath,
+      "personal": pidInformation,
+      "experience": experience,
+      "education": education,
+      "skills": skills,
+      "recommendations": recommendations,
+      "accomplishments": accomplishments
+    };
+    var outputObj = JSON.stringify(linkedinProfile);
+	return linkedinProfile;
+}
 async function initScrolls() {
   await smoothScrollDown();
   await runrun();
@@ -264,6 +315,10 @@ async function initScrolls() {
   await getRecommendations();
   await getAccomplishments();
   await getSkills();
+  await clickContact();
+  await getPID();
+  var profObj = await fullObject();
+console.log(profObj)
 }
 
 initScrolls()
