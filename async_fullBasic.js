@@ -1,8 +1,9 @@
+
 var cn = (ob, nm) => ob ? ob.getElementsByClassName(nm) : console.log(ob);
 var tn = (ob, nm) => ob.getElementsByTagName(nm);
 var gi = (ob, nm) => ob.getElementById(nm);
 var delay = (ms) => new Promise(res => setTimeout(res, ms));
-var reg = (elm, n) => elm != null ? elm[n] : '';
+var reg = (el, n) => el ? el[n] : '';
 var doc = document;
 var docb = doc.body;
 
@@ -64,28 +65,39 @@ async function runrun() {
   await expander("lt-line-clamp__more");
 }
 
-var vld = (elm, n) => elm != null ? elm[n] : '';
-var checker = (elm, n) => elm[n] != undefined ? tn(elm[n], 'p')[0].innerText.replace(/\n/g, '<br>').replace(/"/g, "'").replace(/,/g, ';') : '';
-var checker2 = (elm, n) => elm[n] != undefined ? elm[n].getElementsByTagName('span')[1].innerText.trim() : '';
-var checkElmText = (elm, n) => elm[n] != undefined && elm[n] != null ? elm[n].innerText.trim() : '';
+var vld = (el, n) => el ? el[n] : '';
 
-var formatNow = "15 " + /(?<=\w{3}\s+)\w{3}/.exec(new Date())[0] + ' ' + new Date().getFullYear();
+var checker = (el, n) => el[n] ? tn(el[n], 'p')[0].innerText.replace(/\n/g, '<br>').replace(/"/g, "'").replace(/,/g, ';') : '';
+
+var checker2 = (el, n) => el[n] ? el[n].getElementsByTagName('span')[1].innerText.trim() : '';
+
+var checkElmText = (el, n) => el[n] ? el[n].innerText.trim() : '';
+
+var formatNow = /(?<=\w{3}\s+)\w{3}/.exec(new Date())[0] + ' ' + new Date().getFullYear();
+
+var xmonths = /Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec/;
+
+var normalizeRecDate = (str) => reg(/\d+(?=,)/.exec(str),0) +' '+ reg(xmonths.exec(str),0) +' '+ reg(/(?<=,\s+)\d+/.exec(str),0);
+
 
 function clickContact() { 
 	if(cn(doc, 'pv-top-card-v2-section__links')[0]) Array.from(tn(cn(doc, 'pv-top-card-v2-section__links')[0],'a')).map(itm=> {
 		if (/contact-info/.test(itm.href)) itm.click();
     });
 }
+
+
+
+
 function dateParser(str) {
-  var xmonths = /Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec/;
   var xPres = /Present/;
   if (/\d+/.test(str) === true || xPres.test(str)) {
     if (xmonths.test(str) === true) {
-      return ("15 " + str).trim();
+      return (str).trim();
     } else if (xPres.test(str) === true) {
       return formatNow;
     } else {
-      return ("15 Jul " + str).trim();
+      return (str).trim();
     }
   } else {
     return '';
@@ -204,7 +216,7 @@ async function getRecommendations() {
           "profile": recId,
           "title": recTitle,
           "relationship": recRelation,
-          "date": recDate,
+          "date": normalizeRecDate(recDate),
           "text": recText
         });
       }
@@ -215,7 +227,7 @@ async function getRecommendations() {
           "profile": recId,
           "title": recTitle,
           "relationship": recRelation,
-          "date": recDate,
+          "date": normalizeRecDate(recDate),
           "text": recText
         });
       }
@@ -224,6 +236,7 @@ async function getRecommendations() {
   await getReceived(recPanel, 0);
   await getReceived(recPanel, 1);
 }
+
 
 function getSkills() {
     var expandedSkills = gi(doc,'skill-categories-expanded');
